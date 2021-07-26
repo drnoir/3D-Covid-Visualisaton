@@ -2,7 +2,7 @@
 ## By Chris Godber
 
 A visualisation tool to represent daily new cases of Covid in England
-made with three js
+made with three js.
 
 
 threejs-starter-kit
