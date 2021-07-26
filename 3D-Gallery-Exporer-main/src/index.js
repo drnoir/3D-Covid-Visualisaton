@@ -53,8 +53,7 @@ preloader.init(new ImageResolver(), new GLTFResolver(), new TextureResolver())
 preloader.load([
   { id: 'searchImage', type: 'image', url: SMAAEffect.searchImageDataURL },
   { id: 'areaImage', type: 'image', url: SMAAEffect.areaImageDataURL },
-  { id: 'helmet', type: 'gltf', url: 'assets/models/DamagedHelmet.glb' },
-  { id: 'env', type: 'texture', url: 'assets/textures/pisa.jpg' }
+
 ]).then(() => {
   initPostProcessing()
   onResize()
