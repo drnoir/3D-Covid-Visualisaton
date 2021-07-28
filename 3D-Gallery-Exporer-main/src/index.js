@@ -31,7 +31,8 @@ renderer.setClearColor(0x3d3b33)
 /* Main scene and camera */
 const scene = new Scene()
 const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
-const controls = new OrbitControls(camera)
+// const controls = new OrbitControls(camera)
+const controls = new OrbitControls(camera, renderer.domElement ); // Here is the magic
 camera.position.z = 10
 controls.enableDamping = true
 controls.dampingFactor = 0.15
@@ -131,18 +132,92 @@ preloader.load([
     cases.style.color = 'white';
     cases.style.background = 'black';
     cases.style.top = '0';
+    cases.style.left = '0';
     cases.style.fontSize = "1.2em";
     cases.style.fontFamily = "Verdana";
     cases.style.textAlign = 'center';
-    cases.style.width = '100%';
+    cases.style.width = '25%';
     cases.style.margin = '0 auto';
-    cases.style.opacity = '0.8';
+    cases.style.opacity = '1';
+    cases.style.height = '100%';
+
     cases.innerHTML =
         "<h3>Three JS Covid Cases 3D Visualisation</h3>"+
-        "<p>New Covid Cases England "+todayDate+"</p>"
-        + "<div class ='timerSec'><p>"+todayData+"</p>"
+        "<p>New Covid Cases England</p>"
+        + "<div class ='timerSec'><p>"+todayData+"</p></div>"
+        +"<p>Select Date (Last 50 days)</p>"
+        + "<select id ='selectDate'></select>"
         +"<p> Data Source : gov.uk</p>"
+
     container.appendChild(cases);
+
+    const select = document.getElementById('selectDate');
+
+    for (let i = 0; i<=50; i++){
+      console.log(result.data[i].date);
+      const opt = document.createElement('option');
+      opt.value =  result.data[i].newCases;
+      opt.innerHTML = result.data[i].date;
+      select.appendChild(opt);
+    }
+
+    select.addEventListener("change", function() {
+
+      while(scene.children.length > 0){
+        scene.remove(scene.children[0]);
+      }
+      const caseCount = document.getElementsByClassName("timerSec")
+      const selectBox = document.getElementById('selectDate');
+      const value = selectBox.value;
+      console.log(value);
+
+      let todayData = value;
+      console.log(resultLength, todayIndx, todayData);
+
+      for(var i = 0; i < caseCount.length; i++){
+        caseCount[i].innerText=todayData;    // Change the content
+      }
+
+      let points = [];
+      for ( let i = 0; i <todayData / 100  ; i ++ ) {
+
+        let randX = Math.random() * 2 - 1;
+        let randY = Math.random() * 2 - 1;
+        let randZ = Math.random() * 2 - 1;
+        let particle = new THREE.Sprite( material );
+        particle.position.x = randX;
+        particle.position.y = randY;
+        particle.position.z = randZ;
+
+        particle.position.normalize();
+        particle.position.multiplyScalar( Math.random() * 20 + 250);
+        particle.scale.x = particle.scale.y = 5;
+        particle.scale.y = particle.scale.y = 5;
+        particle.scale.z = particle.scale.z = 5;
+        scene.add( particle);
+        points.push( particle.position );
+
+        const material = new THREE.LineBasicMaterial({
+          color: 'red'
+        });
+
+        // lines
+        let geometry = new THREE.BufferGeometry().setFromPoints( points );
+        // let textMap = new THREE.TextBufferGeometry("hello world", geometry, new THREE.TextBufferGeometry( { color: 0xffffff, opacity: 0.8 } ) );
+
+        // let textMap = new THREE.TextGeometry( "Hello World", { color: 0xffffff, opacity: 0.8 } );
+        let line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.8 } ) );
+        scene.add( line );
+
+        camera.position.z = 500;
+      }
+
+      const container = document.createElement( 'div' );
+      document.body.appendChild( container );
+
+    });
+
+
 
   };  // main
 
@@ -150,8 +225,6 @@ preloader.load([
     console.error(err);
     process.exitCode = 1;
   });
-
-
 })
 
 /* some stuff with gui */
